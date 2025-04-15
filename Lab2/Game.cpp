@@ -26,6 +26,7 @@ vector<vector<char>> Game::Make_move(Move move/*, bool& success*/){
         if(move.moveType == "Raid"){
             for(Move m : get_raided_squares(move)){
                 board[m.row][m.col] = move.player;
+                m.raidedSquares.push_back(pair<int, int>(m.row, m.col));
             }
         }
         history.push_back(move);
@@ -44,8 +45,11 @@ Move Game::Undo_move(){
     board[last_move.row][last_move.col] = '.'; // resets space we moved to
     // undo special action on raid
     if(last_move.moveType == "Raid"){
-        for(Move m : get_raided_squares(last_move)){
-            board[m.row][m.col] = '.';
+        // for(Move m : get_raided_squares(last_move)){
+        //     board[m.row][m.col] = '.';
+        // }
+        for(pair<int, int> coord : last_move.raidedSquares){
+            board[coord.first][coord.second] = getOtherPlayer(last_move.player);
         }
     }
     return last_move;
@@ -60,23 +64,27 @@ vector<Move> Game::getMoves(){
                 m.moveType = "Stake";
                 moves.insert(moves.begin(), m); // so that stakes are evaluated first
                 if(is_raid_legal(m)){
-                    m.moveType = "Raid";
-                    moves.push_back(m);
+                    Move raid = m;
+                    raid.moveType = "Raid";
+                    moves.push_back(raid);
                 }
             }
         }
     }
+    cout << "printing" << endl;
     print_vec(moves);
+    cout << "returning" << endl;
     return moves;
 }
 
 Move Game::CoordToMove(int col, int row){
     string newCol;
-    while(col >= 0){
-        char newChar = static_cast<char>((col % 26) + 65); // does the funky little translation
+    int copyCol = col;
+    while(copyCol >= 0){
+        char newChar = static_cast<char>((copyCol % 26) + 65); // does the funky little translation
         newCol.push_back(newChar);
-        if(col >= 26){
-            col -= 26;
+        if(copyCol >= 26){
+            copyCol -= 26;
         }
         else{
             break;
@@ -89,6 +97,10 @@ Move Game::CoordToMove(int col, int row){
     madeMove.move = newCol + newRow;
     madeMove.row = row;
     madeMove.col = col;
+
+    if(row < 0 || row >= board.size() || col < 0 || col >= board[row].size()){
+        cout << "invalid pair attempted to add: " << row << " " << col << endl;
+    }
 
     return madeMove;
 }
@@ -146,7 +158,7 @@ bool Game::check_near(Move move, char player){
 
 vector<Move> Game::get_raided_squares(Move move){
     vector<Move> squares;
-    char otherPlayer = move.player == 'X' ? 'O' : 'X';
+    char otherPlayer = getOtherPlayer(move.player); //move.player == 'X' ? 'O' : 'X';
     Move tempmove;
     if(move.col - 1 >= 0 && board[move.row][move.col - 1] == otherPlayer){ // check up
         tempmove.col = move.col - 1;

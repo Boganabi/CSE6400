@@ -35,7 +35,7 @@ Move SearchAgents::Search(vector<vector<int>> board, vector<vector<char>> state,
     for(Move m : moves){
         m.player = player;
         state = game.Make_move(m);
-        char newplayer = player == 'X' ? 'O' : 'X';
+        char newplayer = game.getOtherPlayer(player); // player == 'X' ? 'O' : 'X';
         tempmove = Search(board, state, depth - 1, newplayer, !isMaximizing, isABSearch, alpha, beta);
         if((isMaximizing && tempmove.evaluation > score) || (!isMaximizing && tempmove.evaluation < score)){ // checks if we need to update score
             score = tempmove.evaluation;

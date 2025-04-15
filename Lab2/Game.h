@@ -14,6 +14,8 @@ struct Move{
     // for internal use to manage board as vector
     int row;
     int col;
+
+    vector<pair<int, int>> raidedSquares;
 };
 
 class Game{
@@ -29,6 +31,8 @@ class Game{
     void setPosition(vector<vector<char>> newPos);
 
     vector<Move> getMoves();
+
+    char getOtherPlayer(char player) { return player == 'X' ? 'O' : 'X'; };
 
     bool game_over = false;
 
