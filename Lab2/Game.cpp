@@ -2,7 +2,7 @@
 #include "Game.h"
 
 Game::Game(){
-    board = {{}};
+    board = vector<vector<char>>();
 }
 
 Game::Game(vector<vector<char>> board){
@@ -13,6 +13,16 @@ void Game::setPosition(vector<vector<char>> newPos){
     board = newPos;
 }
 
+bool Game::check_legal(Move move){
+    if(board[move.row][move.col] == '.'){
+        if(move.row >= 0 && move.row < board.size() && move.col >= 0 && move.col < board[move.row].size()){
+            return true;
+        }
+    }
+    
+    return false;
+}
+
 vector<vector<char>> Game::Make_move(Move move/*, bool& success*/){
     // int r, c = -1;
     // MoveToCoord(c, r, move);
@@ -20,7 +30,9 @@ vector<vector<char>> Game::Make_move(Move move/*, bool& success*/){
     //     board[r][c] = move.player; // if column is not represented by letter then swap these
     //     success = true;
     // }
-    if(move.row >= 0 && move.row < board.size() && move.col >= 0 && move.col < board[move.row].size()){
+    cout << "before move:" << endl;
+    print_board();
+    if(move.row >= 0 && move.row < board.size() && move.col >= 0 && move.col < board[move.row].size() && board[move.row][move.col] == '.'){
         board[move.row][move.col] = move.player; // if column is not represented by letter then swap these
         // do special action on raid
         if(move.moveType == "Raid"){
@@ -28,8 +40,13 @@ vector<vector<char>> Game::Make_move(Move move/*, bool& success*/){
             for(Move m : raided){
                 board[m.row][m.col] = move.player;
                 // m.raidedSquares.push_back({m.row, m.col});
-                m.raidedSquares.push_back(pair<int, int>(m.row, m.col));
+                move.raidedSquares.push_back(pair<int, int>(m.row, m.col));
             }
+            // cout << "Raided squares stored in move: ";
+            // for (auto& p : move.raidedSquares) {
+            //     cout << "(" << p.first << ", " << p.second << ") ";
+            // }
+            // cout << endl;
         }
         history.push_back(move);
         game_over = check_game_over();
@@ -37,23 +54,33 @@ vector<vector<char>> Game::Make_move(Move move/*, bool& success*/){
     else{
         cout << "skipping move with row : " << move.row << " col: " << move.col << endl;
     }
+
+    cout << "after move " << move.move << " (" << move.moveType << ")" << endl;
+    print_board();
     return board;
 }
 
 Move Game::Undo_move(){
-    Move last_move = history.back();
-    history.pop_back();
-    board[last_move.row][last_move.col] = '.'; // resets space we moved to
-    // undo special action on raid
-    if(last_move.moveType == "Raid"){
-        // for(Move m : get_raided_squares(last_move)){
-        //     board[m.row][m.col] = '.';
-        // }
-        for(pair<int, int> coord : last_move.raidedSquares){
-            board[coord.first][coord.second] = getOtherPlayer(last_move.player);
+    cout << "before undo:" << endl;
+    print_board();
+    if(history.size() > 0){
+        Move last_move = history.back();
+        history.pop_back();
+        board[last_move.row][last_move.col] = '.'; // resets space we moved to
+        // undo special action on raid
+        if(last_move.moveType == "Raid"){
+            // for(Move m : get_raided_squares(last_move)){
+            //     board[m.row][m.col] = '.';
+            // }
+            for(pair<int, int> coord : last_move.raidedSquares){
+                board[coord.first][coord.second] = getOtherPlayer(last_move.player);
+            }
         }
+        cout << "after undo " << last_move.move << " (" << last_move.moveType << ")" << endl;
+        print_board();
+        return last_move;
     }
-    return last_move;
+    return Move();
 }
 
 vector<Move> Game::getMoves(char player){
@@ -211,4 +238,13 @@ void Game::print_vec(const vector<Move>& vec){
         cout << endl;
     }
     cout << endl;
+}
+
+void Game::print_board(){
+    for(vector<char> row : board){
+        for(char c : row){
+            cout << c;
+        }
+        cout << endl;
+    }
 }

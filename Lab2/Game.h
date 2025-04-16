@@ -47,6 +47,8 @@ class Game{
 
     bool game_over = false;
 
+    bool check_legal(Move move);
+
     private:
     vector<vector<char>> board;
     
@@ -70,4 +72,6 @@ class Game{
     vector<Move> get_raided_squares(Move move);
 
     void print_vec(const vector<Move>& vec);
+
+    void print_board();
 };
