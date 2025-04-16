@@ -28,7 +28,7 @@ vector<vector<char>> Game::Make_move(Move move/*, bool& success*/){
             for(Move m : raided){
                 board[m.row][m.col] = move.player;
                 // m.raidedSquares.push_back({m.row, m.col});
-                // m.raidedSquares.push_back(pair<int, int>(m.row, m.col));
+                m.raidedSquares.push_back(pair<int, int>(m.row, m.col));
             }
         }
         history.push_back(move);
@@ -37,7 +37,6 @@ vector<vector<char>> Game::Make_move(Move move/*, bool& success*/){
     else{
         cout << "skipping move with row : " << move.row << " col: " << move.col << endl;
     }
-    cout << "move made" << endl;
     return board;
 }
 
@@ -54,12 +53,10 @@ Move Game::Undo_move(){
             board[coord.first][coord.second] = getOtherPlayer(last_move.player);
         }
     }
-    cout << "move undone" << endl;
     return last_move;
 }
 
 vector<Move> Game::getMoves(char player){
-    cout << "getting moves" << endl;
     vector<Move> moves;
     for(int i = 0; i < board.size(); i++){
         for(int j = 0; j < board[i].size(); j++){
@@ -67,27 +64,23 @@ vector<Move> Game::getMoves(char player){
                 Move m = CoordToMove(i, j);
                 m.player = player;
                 m.moveType = "Stake";
-                m.evaluation = 0;
+                // m.evaluation = 0;
                 moves.insert(moves.begin(), m); // so that stakes are evaluated first
                 if(is_raid_legal(m)){
                     Move raid = m;
                     raid.moveType = "Raid";
 
                     // hash to debug
-                    size_t hash = 0;
-                    for (auto& p : raid.raidedSquares) {
-                        hash ^= std::hash<int>()(p.first) ^ std::hash<int>()(p.second);
-                    }
-                    cout << "Hash of raid.raidedSquares: " << hash << endl;
-                    
+                    // size_t hash = 0;
+                    // for (auto& p : raid.raidedSquares) {
+                    //     hash ^= std::hash<int>()(p.first) ^ std::hash<int>()(p.second);
+                    // }
+                    // cout << "Hash of raid.raidedSquares: " << hash << endl;
                     moves.push_back(raid);
                 }
             }
         }
     }
-    // cout << "printing" << endl;
-    // print_vec(moves);
-    cout << "returning" << endl;
     return moves;
 }
 
@@ -105,12 +98,12 @@ Move Game::CoordToMove(int col, int row){
         }
     }
 
-    string newRow = to_string(row);
+    string newRow = to_string(row + 1);
 
-    Move madeMove(row, col);
+    Move madeMove;//(row, col);
     madeMove.move = newCol + newRow;
-    // madeMove.row = row;
-    // madeMove.col = col;
+    madeMove.row = row;
+    madeMove.col = col;
 
     if(row < 0 || row >= board.size() || col < 0 || col >= board[row].size()){
         cout << "invalid pair attempted to add: " << row << " " << col << endl;
@@ -211,10 +204,10 @@ void Game::print_vec(const vector<Move>& vec){
         cout << "moveType: " << item.moveType << endl;
         cout << "evaluation: " << item.evaluation << endl;
         cout << "player: " << item.player << endl;
-        cout << "raidedSquares size: " << item.raidedSquares.size() << endl;
-        for (auto& p : item.raidedSquares) {
-            cout << "(" << p.first << "," << p.second << ") ";
-        }
+        // cout << "raidedSquares size: " << item.raidedSquares.size() << endl;
+        // for (auto& p : item.raidedSquares) {
+        //     cout << "(" << p.first << "," << p.second << ") ";
+        // }
         cout << endl;
     }
     cout << endl;

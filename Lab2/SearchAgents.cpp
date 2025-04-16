@@ -12,8 +12,8 @@ SearchAgents::SearchAgents(vector<vector<char>> board){
 void SearchAgents::FindBestMove(string& move, string& moveType, vector<vector<char>>& boardState, vector<vector<int>> board, int depth, string mode, char player){
 
     Move bestmove = Search(board, boardState, game, depth, player, true, mode == "ALPHABETA", INT_MIN, INT_MAX);
-    cout << "got best move" << endl;
     move = bestmove.move;
+    cout << "got best move: " << move << endl;
     moveType = bestmove.moveType;
     // bool success = false;
     boardState = game.Make_move(bestmove/*, success*/);
@@ -24,40 +24,38 @@ void SearchAgents::FindBestMove(string& move, string& moveType, vector<vector<ch
 }
 
 Move SearchAgents::Search(vector<vector<int>> board, vector<vector<char>> state, Game gameCopy, int depth, char player, bool isMaximizing, bool isABSearch, int alpha, int beta){
-    cout << "searching depth " << depth << endl;
     Move tempmove;
-    tempmove.move = "blank";
-    tempmove.moveType = "blank";
-    tempmove.row = -1;
-    tempmove.col = -1;
-    tempmove.evaluation = 0;
     tempmove.player = player;
-    if(depth <= 0 || gameCopy.game_over){
+    // terminal test
+    if(depth < 0 || gameCopy.game_over){
         int eval = evaluate(board, state, player);
         tempmove.evaluation = eval;
-        cout << "terminal" << endl;
-        tempmove.print();
         return tempmove;
     }
     vector<Move> moves = gameCopy.getMoves(player);
+    string indent = depth == 1 ? " " : "  ";
+    for(Move debugmove : moves){
+        cout << indent;
+        debugmove.print();
+    }
     int score = isMaximizing ? INT_MIN : INT_MAX;
     for(Move m : moves){
         m.player = player;
-        cout << "making move" << endl;
         state = gameCopy.Make_move(m);
-        char newplayer = gameCopy.getOtherPlayer(player); // player == 'X' ? 'O' : 'X';
+        char newplayer = game.getOtherPlayer(player); // player == 'X' ? 'O' : 'X';
         Move result = Search(board, state, gameCopy, depth - 1, newplayer, !isMaximizing, isABSearch, alpha, beta);
-        cout << "left lower depth" << endl;
-        // tempmove = Search(board, state, gameCopy, depth - 1, newplayer, !isMaximizing, isABSearch, alpha, beta);
+        cout << indent << "evaluating move: ";
+        result.print();
         if((isMaximizing && result.evaluation > score) || (!isMaximizing && result.evaluation < score)){ // checks if we need to update score
-        // if((isMaximizing && tempmove.evaluation > score) || (!isMaximizing && tempmove.evaluation < score)){ // checks if we need to update score
-            // score = tempmove.evaluation;
+            cout << indent << "accepted" << endl;
             score = result.evaluation;
-            // tempmove.move = m.move;
-            // tempmove.moveType = m.moveType;
             tempmove = m;
             tempmove.evaluation = result.evaluation;
-        }    
+            // tempmove.print();
+        }
+        else{
+            cout << indent << "rejected" << endl;
+        }
         if(isABSearch){ // if we are using alpha/beta pruning
             if ((isMaximizing && score >= beta) || (!isMaximizing && score <= alpha)){ // checks if we need to prune
                 gameCopy.Undo_move();
@@ -70,10 +68,8 @@ Move SearchAgents::Search(vector<vector<int>> board, vector<vector<char>> state,
                 beta = min(beta, score);
             }
         }
-        cout << "undoing move" << endl;
         gameCopy.Undo_move();
     }
-    cout << "exiting layer: " << depth << endl;
     return tempmove;
 }
 

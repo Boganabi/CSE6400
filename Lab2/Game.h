@@ -18,13 +18,14 @@ struct Move{
     vector<pair<int, int>> raidedSquares;
 
     // constructors so that if destructed with uninitialized values it wont crash
-    Move() = default;
+    // Move() = default;
 
-    Move(int r, int c, string mv = "", string type = "Stake", char pl = ' ', int eval = 0)
-        : move(mv), moveType(type), evaluation(eval), player(pl), row(r), col(c), raidedSquares(vector<pair<int, int>>()) {}
+    // Move(int r, int c, string mv = "", string type = "Stake", char pl = ' ', int eval = 0)
+    //     : move(mv), moveType(type), evaluation(eval), player(pl), row(r), col(c)/*, raidedSquares(vector<pair<int, int>>())*/ {}
 
     void print(){
-        cout << "move " << move << " type " << moveType << " eval " << evaluation << " player " << player << " row " << row << " col " << col << " len of raid " << raidedSquares.size() << endl;
+        cout << "move " << move << " type " << moveType << " eval " << evaluation << " player " << player << " row " << row << " col " << col << endl;
+        // cout << "move " << move << " type " << moveType << " eval " << evaluation << " player " << player << " row " << row << " col " << col << " len of raid " << raidedSquares.size() << endl;
     }
 };
 
