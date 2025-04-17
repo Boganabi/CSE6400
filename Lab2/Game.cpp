@@ -30,8 +30,8 @@ vector<vector<char>> Game::Make_move(Move move/*, bool& success*/){
     //     board[r][c] = move.player; // if column is not represented by letter then swap these
     //     success = true;
     // }
-    cout << "before move:" << endl;
-    print_board();
+    // cout << "before move:" << endl;
+    // print_board();
     if(move.row >= 0 && move.row < board.size() && move.col >= 0 && move.col < board[move.row].size() && board[move.row][move.col] == '.'){
         board[move.row][move.col] = move.player; // if column is not represented by letter then swap these
         // do special action on raid
@@ -55,14 +55,14 @@ vector<vector<char>> Game::Make_move(Move move/*, bool& success*/){
         cout << "skipping move with row : " << move.row << " col: " << move.col << endl;
     }
 
-    cout << "after move " << move.move << " (" << move.moveType << ")" << endl;
-    print_board();
+    // cout << "after move " << move.move << " (" << move.moveType << ")" << endl;
+    // print_board();
     return board;
 }
 
 Move Game::Undo_move(){
-    cout << "before undo:" << endl;
-    print_board();
+    // cout << "before undo:" << endl;
+    // print_board();
     if(history.size() > 0){
         Move last_move = history.back();
         history.pop_back();
@@ -76,8 +76,8 @@ Move Game::Undo_move(){
                 board[coord.first][coord.second] = getOtherPlayer(last_move.player);
             }
         }
-        cout << "after undo " << last_move.move << " (" << last_move.moveType << ")" << endl;
-        print_board();
+        // cout << "after undo " << last_move.move << " (" << last_move.moveType << ")" << endl;
+        // print_board();
         return last_move;
     }
     return Move();
@@ -85,10 +85,16 @@ Move Game::Undo_move(){
 
 vector<Move> Game::getMoves(char player){
     vector<Move> moves;
-    for(int i = 0; i < board.size(); i++){
-        for(int j = 0; j < board[i].size(); j++){
+    vector<Move> raidMoves; // separate vector so that raid moves can be added to end
+    // search backward so that moves are added in right order
+    // for(int i = 0; i < board.size(); i++){
+    for(int i = board.size() - 1; i >= 0; i--){
+        // for(int j = 0; j < board[i].size(); j++){
+        for(int j = board[i].size() - 1; j >= 0; j--){
+            // cout << "board at " << i << ", " << j << " has " << board[i][j] << endl;
             if(board[i][j] == '.'){ 
-                Move m = CoordToMove(i, j);
+                Move m = CoordToMove(j, i); // flipped bc columns were being calculated wrong before
+                // cout << "adding move: " << m.move << endl;
                 m.player = player;
                 m.moveType = "Stake";
                 // m.evaluation = 0;
@@ -103,11 +109,14 @@ vector<Move> Game::getMoves(char player){
                     //     hash ^= std::hash<int>()(p.first) ^ std::hash<int>()(p.second);
                     // }
                     // cout << "Hash of raid.raidedSquares: " << hash << endl;
-                    moves.push_back(raid);
+                    raidMoves.push_back(raid);
                 }
             }
         }
     }
+    moves.insert(moves.end(), raidMoves.begin(), raidMoves.end());
+    // cout << "board state:" << endl;
+    // print_board();
     return moves;
 }
 

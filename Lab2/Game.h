@@ -49,6 +49,10 @@ class Game{
 
     bool check_legal(Move move);
 
+    void print_board();
+
+    void print_vec(const vector<Move>& vec);
+
     private:
     vector<vector<char>> board;
     
@@ -70,8 +74,4 @@ class Game{
 
     // a slower version of check_near since it gets all squares near it
     vector<Move> get_raided_squares(Move move);
-
-    void print_vec(const vector<Move>& vec);
-
-    void print_board();
 };

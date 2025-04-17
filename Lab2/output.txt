@@ -1,4 +1,4 @@
-B2 Stake
+A2 Stake
 X..
-.O.
+O..
 ...
