@@ -43,14 +43,6 @@ void Lab2FileManip::read_file(string& mode, char& player, int& depth, vector<vec
                     }
                 }
             }
-
-            cout << "Read values: " << endl;
-            cout << n << endl;
-            cout << mode << endl;
-            cout << player << endl;
-            cout << depth << endl;
-            debug_print_board(board_values);
-            debug_print_board(board_state);
         }
         else{
             cout << "Invalid input for N detected." << endl;

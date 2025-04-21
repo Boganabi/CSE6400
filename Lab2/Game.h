@@ -17,15 +17,8 @@ struct Move{
 
     vector<pair<int, int>> raidedSquares;
 
-    // constructors so that if destructed with uninitialized values it wont crash
-    // Move() = default;
-
-    // Move(int r, int c, string mv = "", string type = "Stake", char pl = ' ', int eval = 0)
-    //     : move(mv), moveType(type), evaluation(eval), player(pl), row(r), col(c)/*, raidedSquares(vector<pair<int, int>>())*/ {}
-
     void print(){
         cout << "move " << move << " type " << moveType << " eval " << evaluation << " player " << player << " row " << row << " col " << col << endl;
-        // cout << "move " << move << " type " << moveType << " eval " << evaluation << " player " << player << " row " << row << " col " << col << " len of raid " << raidedSquares.size() << endl;
     }
 };
 
@@ -35,7 +28,7 @@ class Game{
     Game();
     Game(vector<vector<char>> board);
 
-    vector<vector<char>> Make_move(Move move/*, bool& success*/);
+    vector<vector<char>> Make_move(Move move);
 
     Move Undo_move();
 
@@ -51,8 +44,6 @@ class Game{
 
     void print_board();
 
-    void print_vec(const vector<Move>& vec);
-
     private:
     vector<vector<char>> board;
     
@@ -61,9 +52,6 @@ class Game{
     // converts column to excel-styled character
     // i.e. 0 = A, 1 = B, ... 25 = Z, 26 = AA, 27 = AB, etc
     Move CoordToMove(int col, int row);
-
-    // does the inverse of the above
-    void MoveToCoord(int& col, int& row, Move move);
 
     bool check_game_over();
 
